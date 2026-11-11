@@ -34,7 +34,10 @@ const fazerLogin = async () => {
       throw new Error(dados.error || dados.message || 'Falha ao autenticar')
     }
 
+    // Salva o token e o nome retornado pela API
     localStorage.setItem('token', dados.token)
+    localStorage.setItem('nomeAdmin', dados.nomeAdmin)
+
     sucesso.value = true
 
     // Redireciona para a página Home

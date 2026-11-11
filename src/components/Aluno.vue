@@ -10,16 +10,32 @@ const voltar = () => {
 
 const nomeAluno = ref('')
 const cpfAluno = ref('')
+const personalId = ref('')
 const alunos = ref<any[]>([])
+const personais = ref<any[]>([])
 
 const Url = 'http://localhost:5188/api/CadastroAluno'
+const UrlPersonal = 'http://localhost:5188/api/CadastroPersonal'
 
 const getHeaders = () => ({
   'Content-Type': 'application/json',
   'Authorization': `Bearer ${localStorage.getItem('token')}`
 })
 
-// GET
+// GET Personais (para preencher o select)
+const GetPersonais = async () => {
+  try {
+    const res = await fetch(UrlPersonal, { 
+      method: 'GET', 
+      headers: getHeaders() 
+    })
+    if (res.ok) personais.value = await res.json()
+  } catch (err: any) {
+    console.error(err.message)
+  }
+}
+
+// GET Alunos
 const GetAluno = async () => {
   try {
     const res = await fetch(Url, { 
@@ -35,7 +51,7 @@ const GetAluno = async () => {
 
 // POST
 const CadastrarAluno = async () => {
-  if (!nomeAluno.value || !cpfAluno.value) return
+  if (!nomeAluno.value || !cpfAluno.value || !personalId.value) return
 
   try {
     const res = await fetch(Url, {
@@ -44,7 +60,8 @@ const CadastrarAluno = async () => {
       body: JSON.stringify({
         id: 0,
         nomeAluno: nomeAluno.value,
-        cpfAluno: cpfAluno.value
+        cpfAluno: cpfAluno.value,
+        personalId: Number(personalId.value)
       })
     })
     if (!res.ok) throw new Error('Falha ao cadastrar')
@@ -60,8 +77,9 @@ const CadastrarAluno = async () => {
 const AtualizarAluno = async (item: any) => {
   const novoNome = prompt('Novo nome:', item.nomeAluno)
   const novoCpf = prompt('Novo CPF:', item.cpfAluno)
+  const novoPersonalId = prompt('Novo Personal ID:', item.personalId)
 
-  if (!novoNome || !novoCpf) return
+  if (!novoNome || !novoCpf || !novoPersonalId) return
 
   try {
     const res = await fetch(Url, {
@@ -70,7 +88,8 @@ const AtualizarAluno = async (item: any) => {
       body: JSON.stringify({
         id: item.id,
         nomeAluno: novoNome,
-        cpfAluno: novoCpf
+        cpfAluno: novoCpf,
+        personalId: Number(novoPersonalId)
       })
     })
     if (!res.ok) throw new Error('Falha ao atualizar')
@@ -101,9 +120,13 @@ const DeletarAluno = async (id: number) => {
 const LimparCampos = () => {
   nomeAluno.value = ''
   cpfAluno.value = ''
+  personalId.value = ''
 }
 
-onMounted(GetAluno)
+onMounted(() => {
+  GetPersonais()
+  GetAluno()
+})
 </script>
 
 <template>
@@ -122,6 +145,16 @@ onMounted(GetAluno)
         <input type="text" id="cpfAluno" v-model="cpfAluno" required />
       </div>
 
+      <div>
+        <label for="personalId">Personal:</label>
+        <select v-model="personalId" required>
+          <option value="" disabled>Selecione um Personal</option>
+          <option v-for="p in personais" :key="p.id" :value="p.id">
+            {{ p.nomePersonal }} (ID: {{ p.id }})
+          </option>
+        </select>
+      </div>
+
       <button type="submit">Cadastrar</button>
     </form>
 
@@ -131,7 +164,7 @@ onMounted(GetAluno)
 
     <ul v-if="alunos.length > 0">
       <li v-for="item in alunos" :key="item.id" style="margin-bottom: 8px;">
-        <strong>{{ item.nomeAluno }}</strong> - CPF: {{ item.cpfAluno }}
+        <strong>{{ item.nomeAluno }}</strong> | CPF: {{ item.cpfAluno }} | Personal ID: {{ item.personalId }}
         <button @click="AtualizarAluno(item)" style="margin-left: 10px;">Editar</button>
         <button @click="DeletarAluno(item.id)">Excluir</button>
       </li>

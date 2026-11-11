@@ -9,7 +9,7 @@ const voltar = () => {
 }
 
 const dataAgendamento = ref('')
-const status = ref('')
+const servico = ref('')
 const alunoId = ref('')
 const personalId = ref('')
 const agendamentos = ref<any[]>([])
@@ -46,7 +46,7 @@ const CadastrarAgendamento = async () => {
       body: JSON.stringify({
         id: 0,
         dataAgendamento: new Date(dataAgendamento.value).toISOString(),
-        status: status.value,
+        servico: servico.value,
         alunoId: Number(alunoId.value),
         personalId: Number(personalId.value)
       })
@@ -60,14 +60,14 @@ const CadastrarAgendamento = async () => {
   }
 }
 
-//PUT
+// PUT
 const AtualizarAgendamento = async (item: any) => {
   const novaData = prompt('Nova Data/Hora (AAAA-MM-DDTHH:mm):', item.dataAgendamento.substring(0, 16))
   const novoAlunoId = prompt('Novo ID do Aluno:', item.alunoId)
   const novoPersonalId = prompt('Novo ID do Personal:', item.personalId)
-  const novoStatus = prompt('Novo Treino:', item.status)
+  const novoservico = prompt('Novo Serviço:', item.servico)
 
-  if (!novaData || !novoAlunoId || !novoPersonalId || !novoStatus) return
+  if (!novaData || !novoAlunoId || !novoPersonalId || !novoservico) return
 
   try {
     const res = await fetch(Url, {
@@ -76,7 +76,7 @@ const AtualizarAgendamento = async (item: any) => {
       body: JSON.stringify({
         id: item.id,
         dataAgendamento: new Date(novaData).toISOString(),
-        status: novoStatus,
+        servico: novoservico,
         alunoId: Number(novoAlunoId),
         personalId: Number(novoPersonalId)
       })
@@ -108,7 +108,7 @@ const DeletarAgendamento = async (id: number) => {
 
 const LimparCampos = () => {
   dataAgendamento.value = ''
-  status.value = 'Pendente'
+  servico.value = ''
   alunoId.value = ''
   personalId.value = ''
 }
@@ -138,8 +138,8 @@ onMounted(GetAgendamentos)
       </div>
 
       <div>
-        <label for="status">Treino:</label>
-        <input type="text" id="status" v-model="status" required />
+        <label for="servico">Serviço:</label>
+        <input type="text" id="servico" v-model="servico" required />
       </div>
 
       <button type="submit">Agendar</button>
@@ -152,9 +152,9 @@ onMounted(GetAgendamentos)
     <ul v-if="agendamentos.length > 0">
       <li v-for="item in agendamentos" :key="item.id" style="margin-bottom: 8px;">
         <strong>Data:</strong> {{ item.dataAgendamento }} | 
-        <strong>Aluno ID:</strong> {{ item.alunoId }} | 
-        <strong>Personal ID:</strong> {{ item.personalId }} | 
-        <strong>Treino:</strong> {{ item.status }}
+        <strong>Aluno:</strong> {{ item.nomeAluno || item.alunoId }} | 
+        <strong>Personal:</strong> {{ item.nomePersonal || item.personalId }} | 
+        <strong>Serviço:</strong> {{ item.servico }}
         
         <button @click="AtualizarAgendamento(item)" style="margin-left: 10px;">Editar</button>
         <button @click="DeletarAgendamento(item.id)">Excluir</button>
