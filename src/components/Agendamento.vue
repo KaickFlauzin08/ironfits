@@ -9,7 +9,7 @@ const voltar = () => {
 }
 
 const dataAgendamento = ref('')
-const status = ref('Pendente')
+const status = ref('')
 const alunoId = ref('')
 const personalId = ref('')
 const agendamentos = ref<any[]>([])
@@ -65,7 +65,7 @@ const AtualizarAgendamento = async (item: any) => {
   const novaData = prompt('Nova Data/Hora (AAAA-MM-DDTHH:mm):', item.dataAgendamento.substring(0, 16))
   const novoAlunoId = prompt('Novo ID do Aluno:', item.alunoId)
   const novoPersonalId = prompt('Novo ID do Personal:', item.personalId)
-  const novoStatus = prompt('Novo Status:', item.status)
+  const novoStatus = prompt('Novo Treino:', item.status)
 
   if (!novaData || !novoAlunoId || !novoPersonalId || !novoStatus) return
 
@@ -138,7 +138,7 @@ onMounted(GetAgendamentos)
       </div>
 
       <div>
-        <label for="status">Status:</label>
+        <label for="status">Treino:</label>
         <input type="text" id="status" v-model="status" required />
       </div>
 
@@ -154,7 +154,7 @@ onMounted(GetAgendamentos)
         <strong>Data:</strong> {{ item.dataAgendamento }} | 
         <strong>Aluno ID:</strong> {{ item.alunoId }} | 
         <strong>Personal ID:</strong> {{ item.personalId }} | 
-        <strong>Status:</strong> {{ item.status }}
+        <strong>Treino:</strong> {{ item.status }}
         
         <button @click="AtualizarAgendamento(item)" style="margin-left: 10px;">Editar</button>
         <button @click="DeletarAgendamento(item.id)">Excluir</button>
